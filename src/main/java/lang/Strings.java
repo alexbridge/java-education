@@ -1,5 +1,6 @@
 package lang;
 
+import static jecl.cli.CliPrinter.TypePrinter.withType;
 import static jecl.cli.CliPrinter.withMemo;
 
 public class Strings {
@@ -7,6 +8,7 @@ public class Strings {
     public static void main(java.lang.String[] args) {
         withMemo("String::stringInitializer", Strings::stringInitializer);
         withMemo("String::stringsArrayInitializer", Strings::stringsArrayInitializer);
+        withMemo("String::stringBuilder", Strings::stringBuilder);
     }
 
     public static void stringInitializer() {
@@ -27,5 +29,25 @@ public class Strings {
 
         withMemo("strings[0].equals(str)", () -> strings[0].equals(str));
         withMemo("strings[0] == str", () -> strings[0].equals(str));
+    }
+
+    public static void stringBuilder() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(withType(true))
+                .append(withType((byte) 123))
+                .append(withType((char) 123))
+                .append(withType((short) 123))
+                .append(withType(123))
+                .append(withType(123L))
+                .append(withType(123.00f))
+                .append(withType(123.00))
+                .append(withType('A'))
+                .append(withType("String"))
+                .appendCodePoint(127);
+
+        System.out.println("String result: " + stringBuilder);
+        System.out.println("String result reverse: " + stringBuilder.reverse());
+
     }
 }
