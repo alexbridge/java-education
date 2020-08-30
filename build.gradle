@@ -17,4 +17,3 @@ dependencies {
 
     compile group: 'org.assertj', name: 'assertj-core', version: '3.+'
 }
-

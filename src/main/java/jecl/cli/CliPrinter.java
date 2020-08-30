@@ -4,8 +4,11 @@ import java.util.function.BooleanSupplier;
 
 public class CliPrinter {
     public static void withMemo(String memo, Runnable method) {
-        System.out.println(" ----- " + memo + " ----- ");
+        String pr = String.format("----- %s -----", memo);
+        System.out.println(pr);
         method.run();
+        System.out.println("\n");
+        System.out.println("-".repeat(pr.length()));
     }
 
     public static void withMemo(String memo, BooleanSupplier method) {

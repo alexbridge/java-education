@@ -10,8 +10,9 @@ public class InstanceInitialize {
     public static void main(String[] args) {
         int integer3 = 0;  // local, must be initialized
 
-        System.out.println(Vehicle.type);
-        System.out.println(Car.type);
+        new Vehicle();
+        new Car();
+
         System.out.println(integer1);
         System.out.println(integer3);
         System.out.println(new InstanceInitialize().integer2 );
