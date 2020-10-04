@@ -8,13 +8,17 @@ public class InstanceInitialize {
     int integer2; // instance, defaults to 0
 
     public static void main(String[] args) {
-        int integer3 = 0;  // local, must be initialized
+        int integer3 = 0;  // local, must be initialized to be used
+        int integer4; // can be defined without usage
+
+
 
         new Vehicle();
         new Car();
 
         System.out.println(integer1);
         System.out.println(integer3);
+        //System.out.println(integer4);
         System.out.println(new InstanceInitialize().integer2 );
     }
 }
