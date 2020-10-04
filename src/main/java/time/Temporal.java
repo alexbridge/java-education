@@ -1,26 +1,27 @@
 package time;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Year;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
+import java.util.stream.IntStream;
+
+import static jecl.cli.CliPrinter.withMemo;
 
 public class Temporal {
 
     public static void main(String[] args) {
-        allSundays();
-        every6Hours();
+        withMemo("All Sundays of January", Temporal::allSundays);
+        withMemo("Every 6 hours during 24 hours", Temporal::every6Hours);
     }
 
     public static void allSundays() {
-        Month month = Month.valueOf("January".toUpperCase());
-        System.out.printf("For the month of %s all Sunday are:%n", month);
+        Month month = Month.JANUARY;
 
         LocalDate localdate = Year.now()
                 .atMonth(month)
                 .atDay(1)
-                .with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
+                .with(
+                        TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY)
+                );
 
         Month mi = localdate.getMonth();
         while (mi == month) {
@@ -31,19 +32,9 @@ public class Temporal {
     }
 
     public static void every6Hours() {
-        Month month = Month.valueOf("January".toUpperCase());
-        System.out.printf("For the month of %s all Sunday are:%n", month);
-
-        LocalDate localdate = Year.now()
-                .atMonth(month)
-                .atDay(1)
-                .with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
-
-        Month mi = localdate.getMonth();
-        while (mi == month) {
-            System.out.printf("%s%n", localdate);
-            localdate = localdate.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
-            mi = localdate.getMonth();
-        }
+        IntStream.iterate(0, h -> h + 6)
+                .limit(24 / 6)
+                .mapToObj(h -> LocalTime.of(h, 0, 0))
+                .forEach(time -> System.out.printf("%s%n", time));
     }
 }
