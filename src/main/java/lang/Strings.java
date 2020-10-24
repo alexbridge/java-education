@@ -9,6 +9,7 @@ public class Strings {
         withMemo("String::stringInitializer", Strings::stringInitializer);
         withMemo("String::stringsArrayInitializer", Strings::stringsArrayInitializer);
         withMemo("String::stringBuilder", Strings::stringBuilder);
+        withMemo("String::stringReplace", Strings::stringReplace);
     }
 
     public static void stringInitializer() {
@@ -48,6 +49,11 @@ public class Strings {
 
         System.out.println("String result: " + stringBuilder);
         System.out.println("String result reverse: " + stringBuilder.reverse());
+    }
 
+    public static void stringReplace() {
+        boolean flag1 = "Java" == "Java".replace( 'J' , 'J' );
+        boolean flag2 = "Java" == "Java".replace( "J" , "J" );
+        System. out .println(flag1 && flag2);
     }
 }
