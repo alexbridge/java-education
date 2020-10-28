@@ -1,20 +1,49 @@
-package algs;
+package hackerrank.algs;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class BieberSelfishSquirrels {
+    static {
+        // simulate stdin in development purposes
+        if (System.getenv("DEVELOPMENT") != null) {
+            String stdin = "3 3 1 3 3";
+            System.setIn(new ByteArrayInputStream(stdin.getBytes()));
+        }
+    }
 
     public static void main(String[] args) {
-        List<int[]> days = new ArrayList<>();
+        System.out.println("Please enter number of squirrels in 5 hollows for first day (space separated)");
+        int[] day = new int[5];
 
-        int[] day = {3, 3, 1, 3, 3};
+        Scanner scanner = new Scanner(System.in);
+
+        Arrays.setAll(day, el -> scanner.nextInt());
+
+        System.out.printf("Checking days for %s", Arrays.toString(day));
+
+        List<int[]> days = new ArrayList<>();
         days.add(day);
 
+        int[] nextDay;
         while (canHollowMigrate(day)) {
-            day = moveHollow(day);
-            days.add(day);
+            System.out.println("Can migrate");
+            nextDay = moveHollow(day);
+            System.out.printf("Day %d\n\t%s\n\t%s\n", days.size() + 1, Arrays.toString(day), Arrays.toString(nextDay));
+            if (Arrays.compare(day, nextDay) == 0) {
+                System.out.println("Migration failed");
+                System.exit(1);
+            }
+            days.add(nextDay);
+            day = nextDay;
+
+            if (days.size() > 10) {
+                System.out.println("Migration failed due to max 50 days limited or recursion");
+                System.exit(1);
+            }
         }
 
         System.out.printf("All squirrels are in same hollow after %d days\n", days.size() - 1);

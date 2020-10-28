@@ -5,12 +5,15 @@ compile-garage:
 run-garage:
 	java -classpath out garage.Test
 
-compile-modules:
+compile-m:
 	javac -d out --module-source-path modules --module jecl,application,hackerrank
 
-run-module-app: compile-modules
+run-m-app: compile-modules
 	java --module-path out --module application/app.App
 
-run-module-hackerrank: compile-modules
+run-m-hackerrank-pangram: compile-m
 	java --module-path out --module hackerrank/hackerrank.strings.Pangram
+
+run-m-hackerrank-algs: compile-m
+	java --module-path out --module hackerrank/hackerrank.algs.BieberSelfishSquirrels
 
