@@ -2,16 +2,14 @@ package net;
 
 import java.net.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class Urls {
     public static void main(String[] args) throws MalformedURLException {
         URL url = new URL("https://google.com:443/path");
 
-        assertThat(url.getProtocol()).isEqualTo("https");
-        assertThat(url.getHost()).isEqualTo("google.com");
-        assertThat(url.getPort()).isEqualTo(443);
-        assertThat(url.getPath()).isEqualTo("/path");
+        assert url.getProtocol().equals("https");
+        assert url.getHost().equals("google.com");
+        assert url.getPort() == 443;
+        assert url.getPath().equals("/path");
 
         httpConnection();
     }
