@@ -1,0 +1,3 @@
+module accounting {
+    requires jecl;
+}
