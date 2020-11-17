@@ -4,9 +4,9 @@ import dto.Car;
 import dto.Quad;
 import dto.Vehicle;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+import static jecl.cli.CliPrinter.TypePrinter.withType;
 import static jecl.cli.CliPrinter.withMemo;
 
 public class Generics {
@@ -32,6 +32,8 @@ public class Generics {
             }});
             System.out.println(extendVehicles.get(0));
         });
+
+        withMemo("Generics::generics1", Generics::generics1);
     }
 
     public static <E> List<E> returnList(List<E> list) {
@@ -44,5 +46,18 @@ public class Generics {
 
     public static List<? extends Vehicle> returnFirstLowerVehicle(List<? extends Vehicle> vehicles) {
         return vehicles;
+    }
+
+    public static void generics1() {
+        Set<? super Number> superNumbers = new HashSet<Number>();
+        superNumbers.add(Integer.valueOf(86));
+        superNumbers.add(75);
+        superNumbers.add(Integer.valueOf(86));
+        superNumbers.add(null);
+        superNumbers.add(309L);
+        Iterator iterator = superNumbers.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(withType(iterator.next()));
+        }
     }
 }

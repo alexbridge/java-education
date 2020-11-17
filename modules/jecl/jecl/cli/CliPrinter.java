@@ -45,6 +45,9 @@ public class CliPrinter {
             return "[string]" + t;
         }
         public static String withType(Object t) {
+            if (t == null) {
+                return "[NULL]";
+            }
             return "[" + t.getClass().getSimpleName() +  "]" + t.toString();
         }
     }
