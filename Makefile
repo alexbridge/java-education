@@ -17,3 +17,6 @@ run-m-hackerrank-pangram: compile-m
 run-m-hackerrank-algs: compile-m
 	java --module-path out --module hackerrank/hackerrank.algs.BieberSelfishSquirrels
 
+compile-zoo-feeding:
+	javac -p out/modules -d out/modules/zoo.animal.feeding modules/zoo.animal.feeding/zoo/animal/feeding/*.java modules/zoo.animal.feeding/module-info.java
+

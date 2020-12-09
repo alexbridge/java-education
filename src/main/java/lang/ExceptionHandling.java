@@ -43,4 +43,16 @@ public class ExceptionHandling {
     public static void badMethod() {
         throw new RuntimeException();
     }
+
+    static class Danger extends RuntimeException {
+        public Danger(String message) {
+            super();
+        }
+
+        public Danger(int value) {
+            super((String) null);
+        }
+    }
 }
+
+

@@ -1,8 +1,8 @@
 package streams;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -22,6 +22,40 @@ public class Main {
                 ));
 
         System.out.println(persons1);
+
+        Stream.of("duck", "duck", "duck", "goose")
+                .distinct()
+                .forEach(System.out::println);
+
+        Stream.of("monkey", "gorilla", "bonobo")
+                .map(String::length)
+                .forEach(System.out::print);
+
+        System.out.println("-".repeat(100));
+
+        List<String> zero = List.of();
+        var one = List.of("Bonobo");
+        var two = List.of("Mama Gorilla", "Baby Gorilla");
+        Stream.of(zero, one, two)
+                .flatMap(m -> m.stream())
+                .sorted(Comparator.reverseOrder())
+                .forEach(System.out::println);
+
+        System.out.println("-".repeat(100));
+
+        List.of("Toby", "Anna", "Leroy", "Alex")
+                .stream()
+                .filter(n -> n.length() == 4)
+                .sorted()
+                .limit(2)
+                .forEach(System.out::println);
+
+        System.out.println("-".repeat(100));
+
+        new Random().ints()
+                .limit(10)
+                .sorted()
+                .forEach(System.out::println);
 
     }
 }
