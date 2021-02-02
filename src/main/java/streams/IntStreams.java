@@ -1,6 +1,7 @@
 package streams;
 
 import java.util.Arrays;
+import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 
 public class IntStreams {
@@ -19,5 +20,18 @@ public class IntStreams {
 
         //
         IntStream.iterate(1, i -> i + 2).limit(6).forEach(System.out::println);
+
+        IntStream is = IntStream.of(1, 3, 5);
+        // int x = is.filter(i->i%2 == 0).average(); //1 OptionalDouble
+        OptionalDouble x = is.filter(i->i%2 == 0).average(); //1 OptionalDouble
+        System.out.println(x);
+
+        int y = is.filter( i->i%2 != 0 ).sum();//2 int
+        System.out.println(y);
+
+        is = IntStream.of(1, 3, 5, 9);
+        // int z = is.filter( i->i%3 != 0 ).count();//3 long
+        long z = is.filter(i->i%3 != 0 ).count(); //3 long
+        System.out.println(z);
     }
 }

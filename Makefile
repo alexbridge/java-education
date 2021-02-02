@@ -20,3 +20,22 @@ run-m-hackerrank-algs: compile-m
 compile-zoo-feeding:
 	javac -p out/modules -d out/modules/zoo.animal.feeding modules/zoo.animal.feeding/zoo/animal/feeding/*.java modules/zoo.animal.feeding/module-info.java
 
+run-zoo-feeding:
+	java --module-path modules --module zoo.animal.feeding/zoo.animal.feeding.Task
+
+jar-zoo-feeding:
+	jar -cvf out/jar/modules/zoo.animal.feeding.jar -C modules/zoo.animal.feeding/ .
+
+run-jar-zoo-feeding:
+	java -p out/jar/modules -m zoo.animal.feeding/zoo.animal.feeding.Task
+
+desc-zoo-feeding:
+	java -p out/jar/modules -d zoo.animal.feeding
+	jar -f out/jar/modules/zoo.animal.feeding.jar -d
+
+jdeps-zoo-feeding:
+	jdeps -s out/jar/modules/zoo.animal.feeding.jar
+
+list-jar-modules:
+	java -p out/jar/modules --list-modules
+
