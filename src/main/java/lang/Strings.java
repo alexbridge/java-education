@@ -10,6 +10,14 @@ public class Strings {
         withMemo("String::stringsArrayInitializer", Strings::stringsArrayInitializer);
         withMemo("String::stringBuilder", Strings::stringBuilder);
         withMemo("String::stringReplace", Strings::stringReplace);
+
+        String tea = "Tea";
+        String b = "Tea";
+        System.out.println(tea == b);
+
+        String interned = new String("Tea");
+        System.out.println(tea == interned);
+        System.out.println(tea == interned.intern());
     }
 
     public static void stringInitializer() {

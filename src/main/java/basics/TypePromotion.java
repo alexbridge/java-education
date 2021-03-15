@@ -1,5 +1,7 @@
 package basics;
 
+import jecl.cli.CliPrinter;
+
 public class TypePromotion {
 
     public static void main(String[] args) {
@@ -11,6 +13,19 @@ public class TypePromotion {
         promote(c);
         promote(10.0);
         promote(10.0f);
+
+        int a2 = 117, b2 = 5;
+        int abint = a2 / b2;
+        int abm = a2 * b2;
+        System.out.println(abint);
+        System.out.println(CliPrinter.TypePrinter.withType(a2 / b2));
+
+        System.out.println(CliPrinter.TypePrinter.withType(true && true));
+        System.out.println(CliPrinter.TypePrinter.withType(true & (3 > 4)));
+        System.out.println(CliPrinter.TypePrinter.withType(true || true));
+        System.out.println(CliPrinter.TypePrinter.withType(true | false));
+        System.out.println(CliPrinter.TypePrinter.withType(1 & 2));
+        System.out.println(Character.isLetter('a'));
     }
 
     private static void promote(int value) {
