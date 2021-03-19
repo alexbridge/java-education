@@ -1,8 +1,8 @@
-package metricsystem;
+package hackerrank.enums;
 
 import java.text.DecimalFormat;
 
-public class Main {
+public class MetricSystemCalculator {
 
     public static void main(String[] args) {
 

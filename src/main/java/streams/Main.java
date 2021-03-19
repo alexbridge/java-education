@@ -1,6 +1,7 @@
 package streams;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,5 +58,19 @@ public class Main {
                 .sorted()
                 .forEach(System.out::println);
 
+        Optional<String> minim = List.of("Tob", "An", "Lero", "Alexo")
+                .stream()
+                .min(String::compareTo);
+        System.out.println(minim);
+
+        Comparator<String> sorting = String::compareTo;
+        Predicate<String> filtering = Predicate.not(String::isEmpty);
+
+        Stream<String> strs = List.of("Tob", " ", "An", "Lero", "Alexo").stream();
+        strs = strs.sorted(sorting);
+        strs = strs.filter(filtering);
+        strs.map(String::toCharArray)
+                .map(Arrays::toString)
+                .forEach(System.out::println);
     }
 }

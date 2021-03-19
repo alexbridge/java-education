@@ -1,7 +1,10 @@
 package streams;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.OptionalDouble;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class IntStreams {
@@ -33,5 +36,12 @@ public class IntStreams {
         // int z = is.filter( i->i%3 != 0 ).count();//3 long
         long z = is.filter(i->i%3 != 0 ).count(); //3 long
         System.out.println(z);
+
+        List<Character> chars = IntStream
+                .range(65,90)
+                .mapToObj(c -> (char) c)
+                .peek(a -> System.out.println("peeking: " + a))
+                .collect(Collectors.toCollection(ArrayList::new));
+        System.out.println(chars);
     }
 }
