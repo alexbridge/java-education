@@ -25,10 +25,17 @@ public class Maps {
         mergeMap.put(2, 20);
         mergeMap.put(3, null);
         mergeMap.merge(1, 3, (oldV, newV) -> oldV + newV);
-        mergeMap.merge(3, 3, (oldV, newV) -> oldV + newV);
+        mergeMap.merge(3, 3, Integer::sum);
         System.out.println(mergeMap);
 
-        mergeMap.compute(3, (k, v) -> k + v);
+        mergeMap.compute(3, Integer::sum);
         System.out.println(mergeMap);
+
+        Map<String, String> somes = new HashMap<>(){{ put("1", "2"); }};
+
+        Object somesInterm = (Object) somes;
+
+        HashMap<String, String> somes2 = (HashMap<String, String>) somesInterm;
+        System.out.println(somes2);
     }
 }
