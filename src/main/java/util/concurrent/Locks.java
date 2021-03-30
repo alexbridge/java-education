@@ -30,19 +30,24 @@ public class Locks {
 
     private void addLine(String str) {
         Lock writeLock = lock.writeLock();
-        writeLock.lock();
-        list.add(str);
-        writeLock.unlock();
+        try {
+            writeLock.lock();
+            list.add(str);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     private String getLine(String str) {
         Lock readLock = lock.readLock();
-        readLock.lock();
-        if (list.contains(str)) {
+        try {
+            readLock.lock();
+            if (list.contains(str)) {
+                return str;
+            }
+        } finally {
             readLock.unlock();
-            return str;
         }
-        readLock.unlock();
         return null;
     }
 }
