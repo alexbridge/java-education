@@ -10,6 +10,8 @@ public class MessageFormats {
 
         MessageFormat message = new MessageFormat("{0}:'{TEXT}'{1}");
 
+        System.out.println(message.format(new String[]{"1", "2"}));
+
         Object[] parts;
         try {
             parts = message.parse("Foo:{TEXT}bar");
