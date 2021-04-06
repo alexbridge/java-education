@@ -10,6 +10,7 @@ public class Strings {
         withMemo("String::stringsArrayInitializer", Strings::stringsArrayInitializer);
         withMemo("String::stringBuilder", Strings::stringBuilder);
         withMemo("String::stringReplace", Strings::stringReplace);
+        withMemo("String::concat", Strings::concat);
 
         String tea = "Tea";
         String b = "Tea";
@@ -18,6 +19,15 @@ public class Strings {
         String interned = new String("Tea");
         System.out.println(tea == interned);
         System.out.println(tea == interned.intern());
+    }
+
+    private static void concat() {
+        String strs = "AB";
+        String str = "";
+        str += "A";
+        str += "B";
+        System.out.println(str);
+        System.out.println(str.intern() == "AB");
     }
 
     public static void stringInitializer() {
