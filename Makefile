@@ -18,10 +18,10 @@ run-m-hackerrank-algs: compile-m
 	java --module-path out --module hackerrank/hackerrank.algs.BieberSelfishSquirrels
 
 compile-zoo-feeding:
-	javac -p out/modules -d out/modules/zoo.animal.feeding modules/zoo.animal.feeding/zoo/animal/feeding/*.java modules/zoo.animal.feeding/module-info.java
+	javac -d out/modules/zoo.animal.feeding $$(find modules/zoo.animal.feeding -name "*.java")
 
-run-zoo-feeding:
-	java --module-path modules --module zoo.animal.feeding/zoo.animal.feeding.Task
+run-zoo-feeding: compile-zoo-feeding
+	java --module-path out/modules --module zoo.animal.feeding/zoo.animal.feeding.Task
 
 jar-zoo-feeding:
 	jar -cvf out/jar/modules/zoo.animal.feeding.jar -C modules/zoo.animal.feeding/ .
