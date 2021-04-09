@@ -43,6 +43,8 @@ public class FilesNIO {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("1");
         }
 
         var list = new ArrayList<String>();

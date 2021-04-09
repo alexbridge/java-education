@@ -22,6 +22,10 @@ compile-zoo-feeding:
 
 run-zoo-feeding: compile-zoo-feeding
 	java --module-path out/modules --module zoo.animal.feeding/zoo.animal.feeding.Task
+	java -p out/modules -m zoo.animal.feeding/zoo.animal.feeding.Task
+
+desc-zoo-feeding: compile-zoo-feeding
+	java -p out/modules -d zoo.animal.feeding
 
 jar-zoo-feeding:
 	jar -cvf out/jar/modules/zoo.animal.feeding.jar -C modules/zoo.animal.feeding/ .
