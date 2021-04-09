@@ -9,5 +9,10 @@ public class Arrays {
 
         String[] strs = new String[size];
         System.out.println(strs[0]);
+
+        int[] array = { 6, -4, 12, 0, -10 };
+        // !! Must be sorted
+        java.util.Arrays.sort(array);
+        System.out.println(java.util.Arrays.binarySearch(array, 0));
     }
 }

@@ -12,7 +12,7 @@ public class TypePromotion {
         promote(b);
         promote(c);
         promote(10.0);
-        promote(10.0f);
+        promote(13.0);
 
         int a2 = 117, b2 = 5;
         int abint = a2 / b2;
@@ -40,10 +40,10 @@ public class TypePromotion {
     private static void promote(Integer value) {
         System.out.println("promote Integer value " + value);
     }
-    private static void promote(Float value) {
-        System.out.println("promote Float value " + value);
+    private static void promote(float value) {
+        System.out.println("promote float value " + value);
     }
-    private static void promote(Double value) {
-        System.out.println("promote Double value " + value);
+    private static void promote(Object value) {
+        System.out.println("promote Object value " + value);
     }
 }

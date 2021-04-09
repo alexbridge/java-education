@@ -1,5 +1,7 @@
 package lang;
 
+import java.util.ArrayList;
+
 import static jecl.cli.CliPrinter.TypePrinter.withType;
 import static jecl.cli.CliPrinter.withMemo;
 
@@ -19,6 +21,16 @@ public class Strings {
         String interned = new String("Tea");
         System.out.println(tea == interned);
         System.out.println(tea == interned.intern());
+
+        Object s2 = new ArrayList<String>();
+        Object s4 = new ArrayList<Integer>();
+        if (s2 == s4) {
+            System.out.println("Are equal");
+        };
+    }
+
+    private static boolean compare(Object a, Object b) {
+        return a == b;
     }
 
     private static void concat() {
