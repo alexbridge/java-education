@@ -1,5 +1,7 @@
 package basics;
 
+import java.text.MessageFormat;
+
 public class Enums {
 
     public enum Season {
@@ -7,14 +9,16 @@ public class Enums {
     }
 
     public enum SeasonTimes {
-        WINTER("9am-5pm"),
-        SPRING("9am-5pm"),
+        WINTER,
+        SPRING,
         SUMMER("8am-6pm"),
-        FALL("9am-5pm");
+        FALL;
 
         private final String hours;
-
-        SeasonTimes(String hours) {
+        private SeasonTimes() {
+            this.hours = "9am-5pm";
+        }
+        private SeasonTimes(String hours) {
             this.hours = hours;
         }
 
@@ -40,27 +44,22 @@ public class Enums {
         public String getHours() { return "9am-5pm"; }
     }
 
-    public enum Planet {
-        MERCURY(0.39), VENUS(), EARTH();
-        private double distanceFromSunAU = 1.0;
-        private Planet(double distance){
-            distanceFromSunAU = distance;
-        }
-        private Planet(){
-            distanceFromSunAU = 5.0;
-        }
-        public double getDistance(){
-            return distanceFromSunAU;
-        }
-    }
-
     public static void main(String[] args) {
         System.out.println(Season.SUMMER.name() + ":" + Season.SUMMER.ordinal());
         System.out.println(SeasonTimes.SUMMER.name() + ":" + SeasonTimes.SUMMER.getHours());
         System.out.println(SeasonTimesAware.SUMMER.name() + ":" + SeasonTimesAware.SUMMER.getHours());
 
-        for(Planet p : Planet.values()){
-            System.out.println(p.getDistance());
+        String message = "{0}: {1}: {2}";
+
+        for(SeasonTimes p : SeasonTimes.values()) {
+            System.out.println(
+                    MessageFormat.format(
+                            message,
+                            p.ordinal(),
+                            p.name(),
+                            p.getHours()
+                    )
+            );
         }
     }
 }

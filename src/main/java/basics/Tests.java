@@ -1,11 +1,15 @@
 package basics;
 
-import java.util.Set;
+import jecl.cli.CliPrinter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Tests {
 
-    static class A {
+    /*static class A {
 
         A() {
             logger.append("A");
@@ -28,31 +32,107 @@ public class Tests {
         public C fly() {
             return new C();
         }
+    }*/
+
+    static class Student {
+        public static enum Grade {A, B, C, D, F}
+        private String name;
+        private Grade grade;
+        public Student(String name, Grade grade) {
+            this.name = name;
+            this.grade = grade;
+        }
+        public String toString() {
+            return name + ":" + grade;
+        }
+
+        public Grade getGrade() {
+            return grade;
+        }
+
+        public String getName() {
+            return name;
+        }
+
     }
 
     public static void main(String[] args) {
-        final int i = 0;
-        //System.out.print(4 / i);
+        var ls = Arrays.asList(new Student("S1", Student.Grade.A),
+                new Student("S2", Student.Grade.A),
+                new Student("S3", Student.Grade.B),
+                new Student("S4", Student.Grade.C),
+                new Student("S5", Student.Grade.F));
 
-        Integer.parseInt("0");
+        var group = ls.stream()
+                .filter(student -> student.getGrade() != Student.Grade.F)
+                .collect(Collectors.groupingBy(Student::getGrade,
+                        Collectors.mapping(Student::getName, Collectors.toList())));
+        System.out.println(group);
 
-        Set<String> islandNations = Set.of("Japan", "Australia", "Cyprus", "Cuba", "Taiwan");
-        islandNations = islandNations.stream()
-                .map(s -> {
-                    if (s.equals("Australia"))
-                        return "New Zealand";
-                    else
-                        return s;
-                })
-                .map(n -> n.substring(0, 1))
-                .peek(System.out::println)
-                .collect(Collectors.toSet());
-        System.out.println(islandNations);
-        for (String s : islandNations) {
-            System.out.print(s);
-        }
+        var collection = new ArrayList<>();
+        collection.add(1);
+        var list1 = List.of(collection);
+        collection.add(2);
+        var list2 = List.copyOf(collection);
+        System.out.println(list1);
+        System.out.println(list2);
 
-        A sc = new C();
-        System.out.println(((B) sc.fly()).getClass().getName() );
+        X x = new Y();
+        Y y = new Y();
+        var list = new ArrayList<>();
+        list.add(1);
+
+        double x3 = 39.21;
+        float y3 = 2.1f; // f is important
+
+        System.out.println(
+                CliPrinter.TypePrinter.withType(x3 + y3)
+        );
+    }
+}
+class X {
+    public List<Integer> getCollection() {
+        return new ArrayList<Integer>();
+    }
+    public void print(List<Integer> lst) {
+        System.out.println("X list " + lst);
+    }
+}
+
+class Y extends X {
+    /*public List<? super Integer> getCollection() {
+        return new ArrayList<Integer>();
+    }*/
+    /*public List<? extends Number> getCollection() {
+        return new ArrayList<Integer>();
+    }*/
+    public ArrayList<Integer> getCollection() {
+        return new ArrayList<Integer>();
+    }
+
+    public void print(List<Integer> lst) {
+        System.out.println("Y list " + lst);
+    }
+}
+
+interface Bird {
+    default String fly() {
+        return "fly";
+    }
+}
+
+interface Parrot extends Bird {
+    public String fly();
+}
+
+class RainbowParrot implements Parrot {
+    public static void main(String[] args) {
+        Bird b = new RainbowParrot();
+        System.out.println(b.fly());
+    }
+
+    @Override
+    public String fly() {
+        return null;
     }
 }
