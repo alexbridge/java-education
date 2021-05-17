@@ -36,9 +36,18 @@ public class Enums {
         SPRING,
         SUMMER,
         FALL {
+            @Override
+            public boolean isHealthy() {
+                return false;
+            }
+
             public String getHours() {
                 return "10am-3pm";
             }
+        };
+
+        public boolean isHealthy() {
+            return true;
         };
 
         public String getHours() { return "9am-5pm"; }
@@ -61,5 +70,14 @@ public class Enums {
                     )
             );
         }
+
+        Season SUMMER = Season.FALL;
+        switch (SUMMER) {
+            case WINTER: System.out.print("v");
+            case FALL: System.out.print("v");
+            case SPRING: System.out.print("c");
+            case SUMMER: System.out.print("s");
+            break;
+            default: System.out.println("missing season"); }
     }
 }

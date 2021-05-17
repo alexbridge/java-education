@@ -3,6 +3,7 @@ package streams;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -10,15 +11,28 @@ public class Main {
 
     public static void main(String[] args) {
 
-        IntStream is = IntStream.of(1, 3, 5);
-        double x = is.filter(i->i%2 == 0).average().orElse(0); //1
+        double x = IntStream.of(1, 3, 5).filter(i -> i % 2 == 0).average().orElse(0); //1
         System.out.println(x);
 
-        int y = is.filter( i->i%2 != 0 ).sum();//2
+        System.out.println(
+                DoubleStream
+                        .of(1.0, 3.0, 5.0)
+                        .filter(i -> i % 2 == 0)
+                        .average()
+                        .orElse(0) //1
+        );
+
+        System.out.println(
+                DoubleStream
+                        .of(1.0, 3.0, 5.0)
+                        .filter(i -> i % 2 == 0)
+                        .sum() //1
+        );
+
+        int y = IntStream.of(1, 3, 5).filter(i -> i % 2 != 0).sum();//2
         System.out.println(y);
 
-        is = IntStream.of(1, 3, 5, 9);
-        long z = is.filter( i->i%3 != 0 ).count();//3
+        long z = IntStream.of(1, 3, 5).filter(i -> i % 3 != 0).count();//3
         System.out.println(z);
 
         HashMap<Integer, Person> persons = new HashMap<Integer, Person>() {{

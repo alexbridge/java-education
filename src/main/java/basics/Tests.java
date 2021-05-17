@@ -9,6 +9,17 @@ import java.util.stream.Collectors;
 
 public class Tests {
 
+    protected class Popcorn {
+        private Popcorn() {
+        }
+
+        public final static int butter = 10;
+
+        public void startMovie() {
+            System.out.println(butter);
+        }
+    }
+
     /*static class A {
 
         A() {
@@ -36,12 +47,15 @@ public class Tests {
 
     static class Student {
         public static enum Grade {A, B, C, D, F}
+
         private String name;
         private Grade grade;
+
         public Student(String name, Grade grade) {
             this.name = name;
             this.grade = grade;
         }
+
         public String toString() {
             return name + ":" + grade;
         }
@@ -90,10 +104,12 @@ public class Tests {
         );
     }
 }
+
 class X {
     public List<Integer> getCollection() {
         return new ArrayList<Integer>();
     }
+
     public void print(List<Integer> lst) {
         System.out.println("X list " + lst);
     }
