@@ -1,64 +1,127 @@
 package hackerrank.algs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class FourInARow {
-    enum CheckerValue {EMPTY, PLAYER1, PLAYER2}
+    enum Player {
+        EMPTY("⚪"), PLAYER1("🎅"), PLAYER2("👨‍");
+        private final String avatar;
+        Player(String avatar) {
+            this.avatar = avatar;
+        }
 
-    enum CheckerStatus {DEF, WIN}
+        public String getAvatar() {
+            return avatar;
+        }
+    }
+
+    enum Win {DEF, WIN}
 
     static class Checker {
-        CheckerValue checkerValue = CheckerValue.EMPTY;
-        CheckerStatus checkerStatus = CheckerStatus.DEF;
+        Player player = Player.EMPTY;
+        Win win = Win.DEF;
+        final int R;
+        final int C;
 
-        public CheckerValue getCheckerValue() {
-            return checkerValue;
+        public Checker(int r, int c) {
+            R = r;
+            C = c;
         }
 
-        public void setCheckerValue(CheckerValue checkerValue) {
-            this.checkerValue = checkerValue;
+        public Player getPlayer() {
+            return player;
         }
 
-        public void setCheckerStatus(CheckerStatus checkerStatus) {
-            this.checkerStatus = checkerStatus;
+        public void setPlayer(Player player) {
+            this.player = player;
+        }
+
+        public Win getWin() {
+            return win;
+        }
+
+        public void setWin(Win win) {
+            this.win = win;
+        }
+
+        public int getRow() {
+            return R;
+        }
+
+        public int getColumn() {
+            return C;
         }
 
         @Override
         public String toString() {
-            if (this.checkerStatus == CheckerStatus.WIN) {
-                return "🔘" + " " + this.checkerValue.name();
+            String out;
+            if (this.win == Win.WIN) {
+                out = "\033[1;32m" + player.getAvatar() + "\033[0m";
+            } else {
+                out = player.getAvatar();
             }
-            return this.checkerValue.name();
+
+            return out;
         }
     }
 
-    static final int MAX_ROW = 5;
-    static final int MAX_COLUMN = 6;
-    static Checker[][] board;
-
-    static {
-        board = new Checker[MAX_ROW + 1][MAX_COLUMN + 1];
-        for (Checker[] inner : board) {
-            for (int i = 0; i < inner.length; i++) {
-                inner[i] = new Checker();
-            }
-        }
-    }
+    static final int MAX_ROW = 6;
+    static final int MAX_COLUMN = 7;
+    static Checker[][] BOARD;
 
     public static void main(String[] args) {
-        System.out.println("Initial board");
-        printBoard();
+        for (int i = 0; i < 5; i++) {
+            resetBoard();
+            runRound();
+        }
+    }
 
-        dropChecker(2, CheckerValue.PLAYER1);
-        dropChecker(3, CheckerValue.PLAYER2);
-        dropChecker(2, CheckerValue.PLAYER1);
-        dropChecker(4, CheckerValue.PLAYER2);
-        dropChecker(2, CheckerValue.PLAYER1);
-        dropChecker(2, CheckerValue.PLAYER1);
+    static void resetBoard() {
+        BOARD = new Checker[MAX_ROW][MAX_COLUMN];
+        for (int r = 0; r < BOARD.length; r++) {
+            for (int c = 0; c < BOARD[0].length; c++) {
+                BOARD[r][c] = new Checker(r, c);
+            }
+        }
+    }
 
-        if (checkWin()) {
+    static void runRound() {
+        // Shuffle bots, make initial drops
+        List<Player> players = Arrays.asList(Player.PLAYER1, Player.PLAYER2);
+        Collections.shuffle(players);
+        players.forEach(p -> dropChecker(initialRandomColumn(), p));
+
+        var currentPlayer = players.get(0);
+        Checker checker;
+        boolean haveWinner = false;
+        while (true) {
+            // Get next winning combination
+            checker = getNextWinStep(currentPlayer, 2);
+            if (checker == null) {
+                checker = getNextWinStep(currentPlayer, 3);
+                if (checker == null) {
+                    checker = getNextWinStep(currentPlayer, 4);
+                }
+            }
+            if (checker == null) {
+                printBoard();
+                System.out.println("Can not get next win step for: " + currentPlayer);
+                break;
+            }
+            dropChecker(checker.getColumn(), currentPlayer);
+
+            haveWinner = checkWinCombination(4);
+            if (haveWinner) {
+                break;
+            }
+
+            currentPlayer = currentPlayer == Player.PLAYER1
+                    ? Player.PLAYER2
+                    : Player.PLAYER1;
+
+        }
+
+        if (haveWinner) {
             System.out.println("We have wins");
         } else {
             System.out.println("No wins at board");
@@ -67,17 +130,25 @@ public class FourInARow {
     }
 
     static void printBoard() {
-        for (Checker[] inner : board) {
+        for (Checker[] inner : BOARD) {
             System.out.println(Arrays.toString(inner));
         }
-        System.out.println("");
+        System.out.println(" ");
     }
 
-    public static boolean dropChecker(int column, CheckerValue checkerValue) {
-        if (column <= board[0].length) {
-            for (int i = board.length - 1, c = column - 1; i >= 0; i--) {
-                if (board[i][c].getCheckerValue() == CheckerValue.EMPTY) {
-                    board[i][c].setCheckerValue(checkerValue);
+    static int initialRandomColumn() {
+        int column;
+        do {
+            column = new Random().nextInt(BOARD[0].length - 1);
+        } while (BOARD[MAX_ROW - 1][column].getPlayer() != Player.EMPTY);
+        return column;
+    }
+
+    public static boolean dropChecker(int column, Player player) {
+        if (column <= BOARD[0].length) {
+            for (int r = BOARD.length - 1; r >= 0; r--) {
+                if (BOARD[r][column].getPlayer() == Player.EMPTY) {
+                    BOARD[r][column].setPlayer(player);
                     return true;
                 }
             }
@@ -85,12 +156,45 @@ public class FourInARow {
         return false;
     }
 
-    public static boolean checkWin() {
-        for (int row = board.length - 1; row >= 3; row--) {
-            for (int column = 0; column <= board[0].length - 4; column++) {
-                List<Checker> wins = checkByPosition(row, column);
-                if (wins != null && wins.size() > 0) {
-                    wins.forEach(r -> r.setCheckerStatus(CheckerStatus.WIN));
+    static Checker getNextWinStep(Player player, final int BREADTH) {
+        Checker checker;
+        var allowedValues = List.of(Player.EMPTY, player);
+        for (int row = BOARD.length - 1; row >= 0; row--) {
+            for (int column = 0; column <= BOARD[0].length - 1; column++) {
+
+                checker = BOARD[row][column];
+                if (checker.getPlayer() == Player.EMPTY || checker.getPlayer() != player) {
+                    // Skip empty and not player
+                    continue;
+                }
+
+                List<Checker> wins = checkByPosition(row, column, BREADTH, allowedValues);
+                if (wins != null) {
+                    for (var pos : wins) {
+                        if (pos.getPlayer() == Player.EMPTY) {
+                            return pos;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    static boolean checkWinCombination(final int BREADTH) {
+        Checker checker;
+        for (int row = BOARD.length - 1; row >= 0; row--) {
+            for (int column = 0; column <= BOARD[0].length - BREADTH; column++) {
+
+                checker = BOARD[row][column];
+                if (checker.getPlayer() == Player.EMPTY) {
+                    continue;
+                }
+
+                List<Checker> wins = checkByPosition(row, column, BREADTH, null);
+                if (wins != null) {
+                    // Mark as win
+                    wins.forEach(w -> w.setWin(Win.WIN));
                     return true;
                 }
             }
@@ -98,54 +202,71 @@ public class FourInARow {
         return false;
     }
 
-    static List<Checker> checkByPosition(int row, int column) {
+    static List<Checker> checkByPosition(final int R, final int C, final int BREADTH, List<Player> allowed) {
         List<List<Checker>> variants = new ArrayList<>();
-        // Right
-        variants.add(List.of(
-                board[row][column],
-                board[row][column + 1],
-                board[row][column + 2],
-                board[row][column + 3]
-        ));
-        if (row >= 3) {
-            // Up
-            variants.add(List.of(
-                    board[row][column],
-                    board[row - 1][column],
-                    board[row - 2][column],
-                    board[row - 3][column]
-            ));
-            // Up and right
-            variants.add(List.of(
-                    board[row][column],
-                    board[row - 1][column + 1],
-                    board[row - 2][column + 2],
-                    board[row - 3][column + 3]
-            ));
-            if (column >= 3) {
-                // Up and left
-                variants.add(List.of(
-                        board[row][column],
-                        board[row - 1][column - 1],
-                        board[row - 2][column - 2],
-                        board[row - 3][column - 3]
-                ));
+
+        if (R >= BREADTH - 1 && C >= BREADTH - 1) {
+            // Up and left
+            List<Checker> upAndLeft = new ArrayList<>();
+            for (int row = R, col = C; row > R - BREADTH; row--, col--) {
+                upAndLeft.add(BOARD[row][col]);
             }
+            variants.add(upAndLeft);
+        }
+
+        if (R > BREADTH && C < BREADTH) {
+            List<Checker> upAndRight = new ArrayList<>();
+            for (int row = R, col = C; row > R - BREADTH; row--, col++) {
+                upAndRight.add(BOARD[row][col]);
+            }
+            variants.add(upAndRight);
+        }
+
+        Collections.shuffle(variants);
+
+        if (R >= BREADTH - 1) {
+            List<Checker> up = new ArrayList<>();
+            for (int row = R; row > R - BREADTH; row--) {
+                up.add(BOARD[row][C]);
+            }
+            variants.add(up);
+        }
+
+        if (R <= MAX_ROW - BREADTH) {
+            // Right and down
+            List<Checker> rightAndDown = new ArrayList<>();
+            for (int row = R, col = C; row < R + BREADTH; row++, col++) {
+                rightAndDown.add(BOARD[row][col]);
+            }
+            variants.add(rightAndDown);
+        }
+
+        if (C < BREADTH) {
+            // Right
+            List<Checker> right = new ArrayList<>();
+            for (int col = C; col < C + BREADTH; col++) {
+                right.add(BOARD[R][col]);
+            }
+            variants.add(right);
         }
 
         for (var checkers : variants) {
-            if (checksAreSame(checkers)) {
+            if (allowed != null && checksAreSame(checkers, allowed)) {
+                return checkers;
+            }
+            if (allowed == null && checksAreSame(checkers)) {
                 return checkers;
             }
         }
         return null;
     }
 
+    static boolean checksAreSame(List<Checker> checkers, List<Player> allowed) {
+        return checkers.stream().allMatch(c -> allowed.contains(c.getPlayer()));
+    }
+
     static boolean checksAreSame(List<Checker> checkers) {
         Checker first = checkers.get(0);
-        if (first.getCheckerValue() == CheckerValue.EMPTY) {
-            return false;
-        }
-        return checkers.stream().allMatch(c -> c.getCheckerValue() == first.getCheckerValue());
+        return checksAreSame(checkers, List.of(first.getPlayer()));
     }
 }
