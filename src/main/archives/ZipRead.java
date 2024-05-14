@@ -9,6 +9,7 @@ import java.util.zip.ZipFile;
 public class ZipRead {
 
     public static void main(String[] args) throws IOException {
+        var memoryStart = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         var tempFile = Files.createTempFile("zip", "create");
 
         System.out.println("Temp file: " + tempFile);
@@ -42,5 +43,9 @@ public class ZipRead {
         } finally {
             Files.delete(tempFile);
         }
+
+        var memoryEnd = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+        System.out.println("Memory diff: %s".formatted(memoryEnd - memoryStart));
     }
 }
