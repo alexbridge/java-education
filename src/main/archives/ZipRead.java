@@ -1,10 +1,11 @@
 package archives;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipFile;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class ZipRead {
 
@@ -15,7 +16,8 @@ public class ZipRead {
         System.out.println("Temp file: " + tempFile);
 
         try {
-            Files.write(tempFile, Files.readAllBytes(Path.of("zip-create.zip")));
+            //Files.write(tempFile, Files.readAllBytes(Path.of("zip-create.zip")));
+            Files.copy(Path.of("zip-create.zip"), tempFile, REPLACE_EXISTING);
 
             try (var zipFile = new ZipFile(tempFile.toFile())) {
 
@@ -27,17 +29,22 @@ public class ZipRead {
 
                 if (file0.isPresent()) {
                     var fileEntry = file0.get();
-                    var name = new File(fileEntry.getName()).getName();
+                    var filePath = Path.of(fileEntry.getName());
+                    var fileNamePath = filePath.getFileName();
 
-                    System.out.printf("Zip name %s, entry: %s\n", name, file0.get());
-                    var bytes = zipFile.getInputStream(file0.get()).readAllBytes();
-                    Files.write(Path.of("file_0.txt"), bytes);
+                    System.out.printf("Zip name %s, entry: %s\n", fileNamePath, fileEntry);
 
+                    Files.copy(zipFile.getInputStream(fileEntry), fileNamePath, REPLACE_EXISTING);
+
+                    var bytes = Files.readAllBytes(fileNamePath);
                     var content = new String(bytes);
 
-                    System.out.println("Content: %s [%s]".formatted(
-                            content, content.length()
-                    ));
+                    System.out.printf(
+                            "%s: %s [%s]\n", fileNamePath, Files.probeContentType(fileNamePath), content.length()
+                    );
+                    System.out.printf(
+                            "Content: %s", content
+                    );
                 }
             }
         } finally {
@@ -46,6 +53,6 @@ public class ZipRead {
 
         var memoryEnd = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-        System.out.println("Memory diff: %s".formatted(memoryEnd - memoryStart));
+        System.out.printf("Memory diff: %s%n", memoryEnd - memoryStart);
     }
 }
