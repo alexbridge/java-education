@@ -2,6 +2,7 @@ package jecl.runtime;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Locale;
@@ -23,6 +24,17 @@ public class Profiler {
     public static Supplier<Duration> timeFootprint() {
         LocalDateTime start = LocalDateTime.now();
         return () -> Duration.between(start, LocalDateTime.now());
+    }
+
+    public static Supplier<String> millisFootprint() {
+        var start = System.nanoTime();
+        return () -> {
+            var diff =  System.nanoTime() - start;
+
+            var decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+            decimalFormat.setGroupingUsed(true);
+            return decimalFormat.format(diff);
+        };
     }
 
     public static Supplier<String> memoryFootprintInMib() {
