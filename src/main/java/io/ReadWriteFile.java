@@ -25,30 +25,30 @@ public class ReadWriteFile {
          * Copy with URL HEX Decode: PT1M13.993214793S ms
          * Copy with URL HEX Decode: 82,787,563,505 ns
          */
-        wrapTime("Copy buffered", () -> {
+        wrapTime(false, "Copy buffered", () -> {
             try (
-                    var zipIs = new BufferedInputStream(Files.newInputStream(zipIn, READ));
-                    var zipOs = new BufferedOutputStream(Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING))
+                    var input = new BufferedInputStream(Files.newInputStream(zipIn, READ));
+                    var output = new BufferedOutputStream(Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING))
             ) {
-                zipIs.transferTo(zipOs);
+                input.transferTo(output);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
         });
 
-        wrapTime("Copy byte-by-byte", () -> {
+        wrapTime(true, "Copy byte-by-byte", () -> {
             try (
-                    var zipIs = Files.newInputStream(zipIn, READ);
-                    var zipOs = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = Files.newInputStream(zipIn, READ);
+                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
             ) {
-                zipIs.transferTo(zipOs);
+                input.transferTo(output);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        wrapTime("Channel transfer", () -> {
+        wrapTime(false, "Channel transfer", () -> {
             var chunk = 1024 * 1024; // 0.5Mb
             try (var inputStream = new FileInputStream(zipIn.toString());
                  var outputStream = new FileOutputStream(zipOut.toString());
@@ -70,31 +70,53 @@ public class ReadWriteFile {
             }
         });
 
-        wrapTime("Copy with URL String Decode", () -> {
+        wrapTime(false, "Copy with URL String Decode", () -> {
             try (
-                    var zipIs = new io.input.UrlDecodeInputStream(Files.newInputStream(zipIn, READ));
-                    var zipOs = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = new io.input.UrlDecodeInputStream(Files.newInputStream(zipIn, READ));
+                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
             ) {
-                zipIs.transferTo(zipOs);
+                input.transferTo(output);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
 
-        wrapTime("Copy with URL HEX Decode", () -> {
+        wrapTime(true, "Copy with URL HEX Decode", () -> {
             try (
-                    var zipIs = new io.input.UrlDecodeHexedInputStream(Files.newInputStream(zipIn, READ));
-                    var zipOs = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = new io.input.UrlDecodeHexedInputStream(Files.newInputStream(zipIn, READ));
+                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
             ) {
-                zipIs.transferTo(zipOs);
+                input.transferTo(output);
+
+                System.out.println("Hit: %s, Miss: %s".formatted(input.hit, input.miss));
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        /**
+         * Copy byte-by-byte: PT0.14209307S ms
+         * Copy byte-by-byte: 151,419,958 ns
+         * Pass through copy: PT0.223678579S ms
+         * Pass through copy: 223,821,758 ns
+         */
+        wrapTime(true, "Pass through copy", () -> {
+            try (
+                    var input = new io.input.PassThroughInputStream(Files.newInputStream(zipIn, READ));
+                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+            ) {
+                input.transferTo(output);
+           } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
 
     }
 
-    private static void wrapTime(String prefix, Runnable runnable) throws IOException {
+    private static void wrapTime(boolean toRun, String prefix, Runnable runnable) throws IOException {
+        if (!toRun) {
+            return;
+        }
         Files.deleteIfExists(zipOut);
         Files.createFile(zipOut);
 
