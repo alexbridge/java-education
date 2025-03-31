@@ -1,14 +1,14 @@
 package io.input;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-public class UrlDecodeHexedInputStream extends InputStream {
-    private final InputStream source;
+import static java.nio.file.StandardOpenOption.*;
+
+public class UrlDecodeHexedInputStream extends BufferedInputStream {
     private final int[] buffer = new int[3];
     public int hit;
     public int miss;
@@ -16,23 +16,31 @@ public class UrlDecodeHexedInputStream extends InputStream {
     private int bufferLen;
 
     public UrlDecodeHexedInputStream(InputStream source) {
-        this.source = source;
+        super(source);
         resetBuffer();
     }
 
     public static void main(String[] args) throws IOException {
-        var str = "string + and / slash";
-        var strEncoded = URLEncoder.encode(str, StandardCharsets.UTF_8);
-        strEncoded = strEncoded.replace("+", "%20");
+        //var str = "percent%plus+slash/".repeat(10_000_000);
+        //var plainText = Path.of("plain_text.txt");
+        //Files.deleteIfExists(plainText);
+        //Files.createFile(plainText);
+        //Files.writeString(plainText, str);
+        var urlEncodedText = Path.of("url_encoded.txt");
+        var urlDecodedText = Path.of("url_decoded.txt");
 
-        var input = new UrlDecodeHexedInputStream(new ByteArrayInputStream(strEncoded.getBytes()));
-        var out = new ByteArrayOutputStream();
+        //Files.deleteIfExists(urlEncodedText);
+        //Files.createFile(urlEncodedText);
+        Files.deleteIfExists(urlDecodedText);
+        Files.createFile(urlDecodedText);
+
+        //Files.writeString(urlEncodedText, URLEncoder.encode(str, StandardCharsets.UTF_8));
+
+        var input = new UrlDecodeHexedInputStream(Files.newInputStream(urlEncodedText, READ));
+        var out = Files.newOutputStream(urlDecodedText, WRITE);
 
         input.transferTo(out);
 
-        System.out.println(str);
-        System.out.println(strEncoded);
-        System.out.println(out);
         System.out.printf("Hit: %s, Miss: %s%n", input.hit, input.miss);
     }
 
@@ -52,41 +60,97 @@ public class UrlDecodeHexedInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        if (bufferPos > -1) {
-            if (bufferPos < bufferLen) {
-                return buffer[bufferPos++] & 0xFF;
-            } else {
-                resetBuffer();
+        //System.out.print("\rAvailable at single: " + in.available());
+        //System.out.flush();
+//        if (bufferPos > -1) {
+//            if (bufferPos < bufferLen) {
+//                return buffer[bufferPos++] & 0xFF;
+//            } else {
+//                resetBuffer();
+//            }
+//        }
+//
+//        var b = source.read();
+//        if (b == -1) {
+//            return b;
+//        }
+//
+//        if (b == '%') {
+//            fillBuffer(b);
+//            return buffer[bufferPos++] & 0xFF;
+//        }
+
+        //return in.read();
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        //System.out.print("\rAvailable: " + in.available());
+        //System.out.flush();
+        if (len < 3) {
+            throw new IOException("Buffered read must have larger buffer, %s given".formatted(len));
+        }
+
+        // read 2 bytes less
+        var read = super.read(b, off, len - 2);
+        if (read == -1) {
+            return read;
+        }
+
+        boolean hasPercent = false;
+        for (int i = 0; i < read; i++) {
+            if (b[i] == '%') {
+                hasPercent = true;
+                break;
             }
         }
 
-        var b = source.read();
-        if (b == -1) {
-            return b;
+        if (!hasPercent) {
+            return read;
         }
 
-        if (b == '%') {
-            fillBuffer(b);
-            return buffer[bufferPos++] & 0xFF;
+        var moreLength = 0;
+        if (b[read - 1] == '%') {
+            moreLength = 2;
+        }
+        if (read > 1 && b[read - 2] == '%') {
+            moreLength = 1;
         }
 
-        return b;
-    }
+        var moreRead = 0;
+        if (moreLength > 0) {
+            moreRead = super.read(b, read, moreLength);
+        }
 
-    /**
-     * If this method not present (inherited), then timing is:
-     * Copy with URL HEX Decode: PT1M13.993214793S ms
-     * Copy with URL HEX Decode: 82,787,563,505 ns
-     * If this method is present, then
-     * Copy byte-by-byte: PT0.14209307S ms
-     * Copy byte-by-byte: 151,419,958 ns
-     * Pass through copy: PT0.223678579S ms
-     * Pass through copy: 223,821,758 ns
-     */
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        // @TODO Add buffered decoding
-        return source.read(b, off, len);
+        var effectiveMore = moreRead == -1 ? 0 : moreRead;
+
+        var effectiveB = new byte[read + effectiveMore];
+
+        var cycleB = 0;
+        var cycleEffective = 0;
+        var haveEncoded = false;
+        while (cycleB < effectiveB.length) {
+            if (b[cycleB] == '%' && cycleB < effectiveB.length - 2) {
+                var hex1 = b[cycleB + 1];
+                var hex2 = b[cycleB + 2];
+
+                if (isHexDigit(hex1) && isHexDigit(hex2)) {
+                    effectiveB[cycleEffective++] = (byte) ((hexDigitValue(hex1) << 4) + hexDigitValue(hex2));
+                    hit++;
+                    cycleB += 3;
+                    haveEncoded = true;
+                    continue;
+                }
+                miss++;
+            }
+            effectiveB[cycleEffective++] = b[cycleB++];
+        }
+
+        if (haveEncoded) {
+            System.arraycopy(effectiveB, 0, b, 0, cycleEffective);
+        }
+        return cycleEffective;
     }
 
     private void resetBuffer() {
@@ -95,8 +159,8 @@ public class UrlDecodeHexedInputStream extends InputStream {
     }
 
     private void fillBuffer(int percent) throws IOException {
-        var hex1 = source.read();
-        var hex2 = source.read();
+        var hex1 = in.read();
+        var hex2 = in.read();
 
         bufferPos = 0;
         bufferLen = 1;
@@ -125,11 +189,11 @@ public class UrlDecodeHexedInputStream extends InputStream {
 
     @Override
     public int available() throws IOException {
-        return (bufferLen - bufferPos) + source.available();
+        return (bufferLen - bufferPos) + in.available();
     }
 
     @Override
     public void close() throws IOException {
-        source.close();
+        in.close();
     }
 }

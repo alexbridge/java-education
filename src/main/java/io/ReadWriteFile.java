@@ -9,8 +9,8 @@ import static jecl.runtime.Profiler.millisFootprint;
 import static jecl.runtime.Profiler.timeFootprint;
 
 public class ReadWriteFile {
-    static Path zipIn = Path.of("pack.bin");
-    static Path zipOut = Path.of("pack-2.bin");
+    static Path inPath = Path.of("url_encoded.txt");
+    static Path outPath = Path.of("url_decoded.txt");
 
     public static void main(String[] args) throws IOException {
         /**
@@ -27,8 +27,8 @@ public class ReadWriteFile {
          */
         wrapTime(false, "Copy buffered", () -> {
             try (
-                    var input = new BufferedInputStream(Files.newInputStream(zipIn, READ));
-                    var output = new BufferedOutputStream(Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING))
+                    var input = new BufferedInputStream(Files.newInputStream(inPath, READ));
+                    var output = new BufferedOutputStream(Files.newOutputStream(outPath, WRITE, TRUNCATE_EXISTING))
             ) {
                 input.transferTo(output);
             } catch (IOException e) {
@@ -39,8 +39,8 @@ public class ReadWriteFile {
 
         wrapTime(true, "Copy byte-by-byte", () -> {
             try (
-                    var input = Files.newInputStream(zipIn, READ);
-                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = Files.newInputStream(inPath, READ);
+                    var output = Files.newOutputStream(outPath, WRITE, TRUNCATE_EXISTING)
             ) {
                 input.transferTo(output);
             } catch (IOException e) {
@@ -50,8 +50,8 @@ public class ReadWriteFile {
 
         wrapTime(false, "Channel transfer", () -> {
             var chunk = 1024 * 1024; // 0.5Mb
-            try (var inputStream = new FileInputStream(zipIn.toString());
-                 var outputStream = new FileOutputStream(zipOut.toString());
+            try (var inputStream = new FileInputStream(inPath.toString());
+                 var outputStream = new FileOutputStream(outPath.toString());
                  var inChannel = inputStream.getChannel();
                  var outChannel = outputStream.getChannel()) {
 
@@ -72,8 +72,8 @@ public class ReadWriteFile {
 
         wrapTime(false, "Copy with URL String Decode", () -> {
             try (
-                    var input = new io.input.UrlDecodeInputStream(Files.newInputStream(zipIn, READ));
-                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = new io.input.UrlDecodeInputStream(Files.newInputStream(inPath, READ));
+                    var output = Files.newOutputStream(outPath, WRITE, TRUNCATE_EXISTING)
             ) {
                 input.transferTo(output);
             } catch (IOException e) {
@@ -81,10 +81,17 @@ public class ReadWriteFile {
             }
         });
 
+        /**
+         * Copy byte-by-byte: PT0.14693505S ms
+         * Copy byte-by-byte: 152,373,032 ns
+         * Hit: 30000000, Miss: 0
+         * Copy with URL HEX Decode: PT0.590441391S ms
+         * Copy with URL HEX Decode: 590,564,916 ns
+         */
         wrapTime(true, "Copy with URL HEX Decode", () -> {
             try (
-                    var input = new io.input.UrlDecodeHexedInputStream(Files.newInputStream(zipIn, READ));
-                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = new io.input.UrlDecodeHexedInputStream(Files.newInputStream(inPath, READ));
+                    var output = Files.newOutputStream(outPath, WRITE, TRUNCATE_EXISTING)
             ) {
                 input.transferTo(output);
 
@@ -100,10 +107,10 @@ public class ReadWriteFile {
          * Pass through copy: PT0.223678579S ms
          * Pass through copy: 223,821,758 ns
          */
-        wrapTime(true, "Pass through copy", () -> {
+        wrapTime(false, "Pass through copy", () -> {
             try (
-                    var input = new io.input.PassThroughInputStream(Files.newInputStream(zipIn, READ));
-                    var output = Files.newOutputStream(zipOut, WRITE, TRUNCATE_EXISTING)
+                    var input = new io.input.PassThroughInputStream(Files.newInputStream(inPath, READ));
+                    var output = Files.newOutputStream(outPath, WRITE, TRUNCATE_EXISTING)
             ) {
                 input.transferTo(output);
            } catch (IOException e) {
@@ -117,8 +124,8 @@ public class ReadWriteFile {
         if (!toRun) {
             return;
         }
-        Files.deleteIfExists(zipOut);
-        Files.createFile(zipOut);
+        Files.deleteIfExists(outPath);
+        Files.createFile(outPath);
 
         var ms = timeFootprint();
         var nanos = millisFootprint();
