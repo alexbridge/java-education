@@ -1,0 +1,33 @@
+{
+    "scopesManager.localScopes": [
+        {
+            "id": "mvxn7ipitybr9",
+            "name": "Java 28",
+            "patterns": [
+                "java-education/java-28/src/java/edu/java28/**",
+                "java-education/java-28/README.md"
+            ]
+        },
+        {
+            "id": "mvxn7sjzpn2hl",
+            "name": "Java 25",
+            "patterns": [
+                "java-education/java-25/Makefile",
+                "java-education/java-25/README.md",
+                "java-education/java-25/src/java/edu/java14/**"
+            ]
+        }
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true
+    }
+}
